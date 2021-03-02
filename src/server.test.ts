@@ -4,6 +4,8 @@ import {
   hatchDigipet,
   trainDigipet,
   walkDigipet,
+  ignoreDigipet,
+  rehomeDigipet,
 } from "./digipet/controller";
 import { INITIAL_DIGIPET, setDigipet } from "./digipet/model";
 import app from "./server";
@@ -88,13 +90,16 @@ describe("GET /digipet/hatch", () => {
   });
 });
 
+
+
 describe("action routes", () => {
   test("when the user does not have a digipet, action routes direct them to hatch a digipet and do not call their relevant controllers", async () => {
     const routesAndControllers = {
       /* test for these once written */
-      // "/digipet/feed": feedDigipet,
-      // '/digipet/train': trainDigipet,
+      "/digipet/feed": feedDigipet,
+      '/digipet/train': trainDigipet,
       "/digipet/walk": walkDigipet,
+      "/digipet/ignore": ignoreDigipet,
     };
 
     for (let [route, controller] of Object.entries(routesAndControllers)) {
@@ -114,7 +119,7 @@ describe("action routes", () => {
     }
   });
 
-  describe.skip("GET /digipet/feed", () => {
+  describe("GET /digipet/feed", () => {
     test("if the user has a digipet, it calls the feedDigipet controller and responds with a message about feeding the digipet", async () => {
       // setup: reset digipet
       setDigipet(INITIAL_DIGIPET);
@@ -122,7 +127,7 @@ describe("action routes", () => {
       const response = await supertest(app).get("/digipet/feed");
 
       // response includes a relevant message
-      expect(response.body.message).toMatch(/feed/i);
+      expect(response.body.message).toMatch(/fed/i);
 
       // response includes digipet data
       expect(response.body.digipet).toHaveProperty("happiness");
@@ -144,7 +149,7 @@ describe("action routes", () => {
     });
   });
 
-  describe.skip("GET /digipet/train", () => {
+  describe("GET /digipet/train", () => {
     test("if the user has a digipet, it calls the trainDigipet controller and responds with a message about training the digipet", async () => {
       // setup: reset digipet
       setDigipet(INITIAL_DIGIPET);
@@ -203,4 +208,59 @@ describe("action routes", () => {
       expect(walkDigipet).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe("GET /digipet/ignore", () => {
+    test("if the user has a digipet, it responds with a message about the ignore", async () => {
+      // setup: reset digipet
+      setDigipet(INITIAL_DIGIPET);
+  
+      const response = await supertest(app).get("/digipet/ignore");
+  
+      // response includes a relevant message
+      expect(response.body.message).toMatch(/ignore/i);
+  
+      // response includes digipet data
+      expect(response.body.digipet).toHaveProperty("happiness");
+      expect(response.body.digipet).toHaveProperty("nutrition");
+      expect(response.body.digipet).toHaveProperty("discipline");
+    });
+  
+    it("delegates state change to the ignoreDigipet function", async () => {
+      // setup: reset digipet and mock function
+      setDigipet(INITIAL_DIGIPET);
+      if (jest.isMockFunction(ignoreDigipet) /* type guard */) {
+        ignoreDigipet.mockReset();
+      }
+      // act
+      await supertest(app).get("/digipet/ignore");
+      // assert
+      expect(ignoreDigipet).toHaveBeenCalledTimes(1);
+    });
+  });  
+
+  describe("GET /digipet/rehome", () => {
+    test("if the user has a digipet (and hasn't already rehomed), it responds with a message about the rehome", async () => {
+      // setup: reset digipet
+      setDigipet(INITIAL_DIGIPET);
+  
+      const response = await supertest(app).get("/digipet/rehome");
+  
+      // response includes a relevant message
+      expect(response.body.message).toMatch(/rehome/i);
+    });
+  
+    it("delegates state change to the rehomeDigipet function", async () => {
+      // setup: reset digipet and mock function
+      setDigipet(INITIAL_DIGIPET);
+      if (jest.isMockFunction(rehomeDigipet) /* type guard */) {
+        rehomeDigipet.mockReset();
+      }
+      // act
+      await supertest(app).get("/digipet/rehome");
+      // assert
+      expect(rehomeDigipet).toHaveBeenCalledTimes(1);
+    });
+  });  
 });
+
+

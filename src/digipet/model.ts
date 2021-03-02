@@ -31,13 +31,19 @@ export const INITIAL_DIGIPET = Object.freeze(initialDigipet);
  * The variable is exported purely to _test_ `setDigipet`.
  */
 export let _userDigipet: Digipet | undefined;
+export let _userDigipet2: Digipet | undefined;
 
 /**
  * Get the data for the user digipet (if it exists) - but not the underlying object reference (to protect the data from accidental changes)
  */
-export function getDigipet(): Digipet | null {
+export function getDigipet(): Digipet | undefined {
   // spread to create a shallow copy to avoid mutation
-  return _userDigipet ? { ..._userDigipet } : null;
+  return _userDigipet ? { ..._userDigipet } : undefined;
+}
+
+export function getDigipet2(): Digipet | undefined {
+  // spread to create a shallow copy to avoid mutation
+  return _userDigipet2 ? { ..._userDigipet2 } : undefined;
 }
 
 /**
@@ -48,6 +54,11 @@ export function getDigipet(): Digipet | null {
 export function setDigipet(newDigipet?: Digipet | undefined): void {
   // spread to avoid mutation
   _userDigipet = newDigipet ? { ...newDigipet } : undefined;
+}
+
+export function setDigipet2(_userDigipet?: Digipet | undefined ): void {
+  // spread to avoid mutation
+  _userDigipet2 = _userDigipet ? { ..._userDigipet } : undefined;
 }
 
 /**

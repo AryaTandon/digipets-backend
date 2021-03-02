@@ -12,9 +12,9 @@ describe("getDigipet", () => {
     expect(getDigipet()).not.toBe(digipetTest);
   });
 
-  it("returns null if there is no digipet", () => {
+  it("returns undefined if there is no digipet", () => {
     setDigipet(undefined);
-    expect(getDigipet()).toBeNull();
+    expect(getDigipet()).toBeUndefined();
   });
 
   it("resists accidental mutation", () => {

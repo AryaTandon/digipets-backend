@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
-import { getDigipet } from "./digipet/model";
-import { hatchDigipet, walkDigipet } from "./digipet/controller";
+import { getDigipet, getDigipet2, setDigipet } from "./digipet/model";
+import { hatchDigipet, trainDigipet, feedDigipet, walkDigipet, ignoreDigipet, rehomeDigipet } from "./digipet/controller";
 
 const app = express();
 
@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 app.get("/instructions", (req, res) => {
   res.json({
     message:
-      "You can check out your digipet's stats with /digipet, and add various actions after that with the /digipet/[action], for actions like walk, train, feed, ignore and hatch. For example, try /digipet/walk to walk a digipet!",
+      "Instructions: you can take various actions by clicking the buttons for actions like walk, train, feed, ignore and hatch. For example, try clicking the 'walk' button to walk a digipet. You can also rehome your initial digipet - although it stays in its new home for eternity, and you can't interact with it anymore. You'll have to get another one!",
   });
 });
 
@@ -33,7 +33,8 @@ app.get("/digipet", (req, res) => {
     });
   } else {
     res.json({
-      message: "You don't have a digipet yet! Try hatching one with /hatch",
+      message: "You don't have a digipet yet! Try hatching one by clicking the 'hatch' button.",
+      description: "This is done by going to endpoint /digipet/hatch",
       digipet: undefined,
     });
   }
@@ -56,6 +57,42 @@ app.get("/digipet/hatch", (req, res) => {
   }
 });
 
+app.get("/digipet/feed", (req, res) => {
+  // check the user has a digipet to walk
+  if (getDigipet()) {
+    feedDigipet();
+    res.json({
+      message: "You fed your digipet. It's not as hungry now!",
+      digipet: getDigipet(),
+    });
+  } else {
+    res.json({
+      message:
+        "You don't have a digipet to feed! Try hatching one by clicking the 'hatch' button.",
+        description:
+        "This is done by going to endpoint /digipet/hatch"
+    });
+  }
+});
+
+app.get("/digipet/train", (req, res) => {
+  // check the user has a digipet to walk
+  if (getDigipet()) {
+    trainDigipet();
+    res.json({
+      message: "You trained your digipet. It's more disciplined now!",
+      digipet: getDigipet(),
+    });
+  } else {
+    res.json({
+      message:
+        "You don't have a digipet to train! Try hatching one by clicking the 'hatch' button.",
+        description:
+        "This is done by going to endpoint /digipet/hatch"
+    });
+  }
+});
+
 app.get("/digipet/walk", (req, res) => {
   // check the user has a digipet to walk
   if (getDigipet()) {
@@ -67,7 +104,51 @@ app.get("/digipet/walk", (req, res) => {
   } else {
     res.json({
       message:
-        "You don't have a digipet to walk! Try hatching one with /digipet/hatch",
+        "You don't have a digipet to walk! Try hatching one by clicking the 'hatch' button.",
+        description:
+        "This is done by going to endpoint /digipet/hatch"
+    });
+  }
+});
+
+app.get("/digipet/ignore", (req, res) => {
+  // check the user has a digipet to walk
+  if (getDigipet()) {
+    ignoreDigipet();
+    res.json({
+      message: "You ignored your digipet. How could you?!",
+      digipet: getDigipet(),
+    });
+  } else {
+    res.json({
+      message:
+        "You don't have a digipet to ignore! Try hatching one by clicking the 'hatch' button.",
+        description:
+        "This is done by going to endpoint /digipet/hatch"
+    });
+  }
+});
+
+app.get("/digipet/rehome", (req, res) => {
+  const digipet = getDigipet();
+  const digipet2 = getDigipet2();
+  if (digipet2) {
+    res.json({
+      message:
+        "You can't rehome another digipet because you already have one rehomed!",
+      digipet2,
+    });
+  } else if (digipet && !digipet2) {
+    const digipet2 = rehomeDigipet();
+    setDigipet(undefined);
+    res.json({
+      message:
+        "You have successfully rehomed your 1st digipet!",
+      digipet2,
+    });
+  } else {
+    res.json({
+      message: "You can't rehome a digipet because you don't have any!",
     });
   }
 });
