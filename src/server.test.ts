@@ -7,7 +7,7 @@ import {
   ignoreDigipet,
   rehomeDigipet,
 } from "./digipet/controller";
-import { INITIAL_DIGIPET, setDigipet } from "./digipet/model";
+import { INITIAL_DIGIPET, setDigipet, setDigipet2 } from "./digipet/model";
 import app from "./server";
 
 /**
@@ -33,7 +33,7 @@ describe("GET /", () => {
 describe("GET /instructions", () => {
   it("responds with a message that has important keywords", async () => {
     const response = await supertest(app).get("/instructions");
-    const keywords = ["/digipet", "hatch", "feed", "ignore", "train", "walk"];
+    const keywords = ["digipet", "hatch", "feed", "ignore", "train", "walk"];
     for (let keyword of keywords) {
       // check the keyword is mentioned in the response body
       expect(response.body.message).toMatch(keyword);
@@ -111,8 +111,8 @@ describe("action routes", () => {
       const response = await supertest(app).get(route);
       expect(response.body.message).toMatch(/you don't have/i);
       expect(response.body.message).toMatch(/try/i);
-      // suggest a helpful endpoint
-      expect(response.body.message).toMatch("/digipet/hatch");
+      // // suggest a helpful endpoint
+      // expect(response.body.message).toMatch("/digipet/hatch");
 
       // expect relevant controller not to have been called
       expect(controller).toHaveBeenCalledTimes(0);
@@ -259,6 +259,28 @@ describe("action routes", () => {
       await supertest(app).get("/digipet/rehome");
       // assert
       expect(rehomeDigipet).toHaveBeenCalledTimes(1);
+    });
+  });  
+
+  describe("GET /digipet/setfree", () => {
+    test("if the user has a rehomed digipet, it responds with a message about setting it free", async () => {
+      // setup: reset digipet
+      setDigipet2(INITIAL_DIGIPET);
+  
+      const response = await supertest(app).get("/digipet/setfree");
+  
+      // response includes a relevant message
+      expect(response.body.message).toMatch(/success.*free/i);
+    });
+
+    test("if the user doesn't have a rehomed digipet, it responds with a message about needing one", async () => {
+      // setup: reset digipet
+      setDigipet2(undefined);
+  
+      const response = await supertest(app).get("/digipet/setfree");
+  
+      // response includes a relevant message
+      expect(response.body.message).toMatch(/can't set free/i);
     });
   });  
 });

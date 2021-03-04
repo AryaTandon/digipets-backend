@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { getDigipet, getDigipet2, setDigipet } from "./digipet/model";
+import { getDigipet, getDigipet2, setDigipet, setDigipet2 } from "./digipet/model";
 import { hatchDigipet, trainDigipet, feedDigipet, walkDigipet, ignoreDigipet, rehomeDigipet } from "./digipet/controller";
 
 const app = express();
@@ -135,7 +135,7 @@ app.get("/digipet/rehome", (req, res) => {
   if (digipet2) {
     res.json({
       message:
-        "You can't rehome another digipet because you already have one rehomed!",
+        "You can't rehome another digipet because you already have one rehomed! You can't interact with this digipet anymore now.",
       digipet2,
     });
   } else if (digipet && !digipet2) {
@@ -143,12 +143,28 @@ app.get("/digipet/rehome", (req, res) => {
     setDigipet(undefined);
     res.json({
       message:
-        "You have successfully rehomed your 1st digipet!",
+        "You have successfully rehomed your 1st digipet! You can't interact with this digipet anymore now.",
       digipet2,
     });
   } else {
     res.json({
       message: "You can't rehome a digipet because you don't have any!",
+    });
+  }
+});
+
+app.get("/digipet/setfree", (req, res) => {
+  const digipet2 = getDigipet2();
+  if (!digipet2) {
+    res.json({
+      message:
+        "You can't set free your rehomed digipet because you don't have one rehomed!",
+    });
+  } else {
+    setDigipet2(undefined);
+    res.json({
+      message:
+        "You have successfully set your rehomed digipet free!",
     });
   }
 });
