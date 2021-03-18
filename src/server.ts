@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { getDigipet, getDigipet2, setDigipet, setDigipet2 } from "./digipet/model";
+import { delDB, getDB, getDigipet, getDigipet2, setDigipet, setDigipet2 } from "./digipet/model";
 import { hatchDigipet, trainDigipet, feedDigipet, walkDigipet, ignoreDigipet, rehomeDigipet } from "./digipet/controller";
 
 const app = express();
@@ -24,8 +24,8 @@ app.get("/instructions", (req, res) => {
   });
 });
 
-app.get("/digipet", (req, res) => {
-  const digipet = getDigipet();
+app.get("/digipet", async (req, res) => {
+  const digipet = await getDB(1);
   if (digipet) {
     res.json({
       message: "Your digipet is waiting for you!",
@@ -40,30 +40,31 @@ app.get("/digipet", (req, res) => {
   }
 });
 
-app.get("/digipet/hatch", (req, res) => {
-  const digipet = getDigipet();
+app.get("/digipet/hatch", async (req, res) => {
+  const digipet = await getDB(1);
   if (digipet) {
     res.json({
       message: "You can't hatch a digipet now because you already have one!",
-      digipet,
+      digipet
     });
   } else {
-    const digipet = hatchDigipet();
+    const hatchedDigipet = await hatchDigipet();
     res.json({
       message:
         "You have successfully hatched an adorable new digipet. Just the cutest.",
-      digipet,
+      hatchedDigipet
     });
   }
 });
 
-app.get("/digipet/feed", (req, res) => {
+app.get("/digipet/feed", async (req, res) => {
   // check the user has a digipet to walk
-  if (getDigipet()) {
-    feedDigipet();
+  let digipet = await getDB(1);
+  if (digipet) {
+    await feedDigipet();
     res.json({
       message: "You fed your digipet. It's not as hungry now!",
-      digipet: getDigipet(),
+      digipet: await getDB(1)
     });
   } else {
     res.json({
@@ -75,13 +76,14 @@ app.get("/digipet/feed", (req, res) => {
   }
 });
 
-app.get("/digipet/train", (req, res) => {
+app.get("/digipet/train", async (req, res) => {
   // check the user has a digipet to walk
-  if (getDigipet()) {
-    trainDigipet();
+  let digipet = await getDB(1);
+  if (digipet) {
+    await trainDigipet();
     res.json({
       message: "You trained your digipet. It's more disciplined now!",
-      digipet: getDigipet(),
+      digipet: await getDB(1)
     });
   } else {
     res.json({
@@ -93,13 +95,14 @@ app.get("/digipet/train", (req, res) => {
   }
 });
 
-app.get("/digipet/walk", (req, res) => {
+app.get("/digipet/walk", async (req, res) => {
   // check the user has a digipet to walk
-  if (getDigipet()) {
-    walkDigipet();
+  let digipet = await getDB(1);
+  if (digipet) {
+    await walkDigipet();
     res.json({
       message: "You walked your digipet. It looks happier now!",
-      digipet: getDigipet(),
+      digipet: await getDB(1)
     });
   } else {
     res.json({
@@ -111,13 +114,14 @@ app.get("/digipet/walk", (req, res) => {
   }
 });
 
-app.get("/digipet/ignore", (req, res) => {
+app.get("/digipet/ignore", async (req, res) => {
   // check the user has a digipet to walk
-  if (getDigipet()) {
-    ignoreDigipet();
+  let digipet = await getDB(1);
+  if (digipet) {
+    await ignoreDigipet();
     res.json({
       message: "You ignored your digipet. How could you?!",
-      digipet: getDigipet(),
+      digipet: await getDB(1)
     });
   } else {
     res.json({
@@ -129,9 +133,9 @@ app.get("/digipet/ignore", (req, res) => {
   }
 });
 
-app.get("/digipet/rehome", (req, res) => {
-  const digipet = getDigipet();
-  const digipet2 = getDigipet2();
+app.get("/digipet/rehome", async (req, res) => {
+  const digipet = await getDB(1);
+  const digipet2 = await getDB(2);
   if (digipet2) {
     res.json({
       message:
@@ -139,29 +143,29 @@ app.get("/digipet/rehome", (req, res) => {
       digipet2,
     });
   } else if (digipet && !digipet2) {
-    const digipet2 = rehomeDigipet();
-    setDigipet(undefined);
-    res.json({
-      message:
-        "You have successfully rehomed your 1st digipet! You can't interact with this digipet anymore now.",
-      digipet2,
-    });
+      await rehomeDigipet()
+      await delDB(1);
+      res.json({
+        message:
+          "You have successfully rehomed your 1st digipet! You can't interact with this digipet anymore now.",
+        digipet2: await getDB(2)
+      });
   } else {
-    res.json({
-      message: "You can't rehome a digipet because you don't have any!",
-    });
-  }
+      res.json({
+        message: "You can't rehome a digipet because you don't have any!",
+      });
+    }
 });
 
-app.get("/digipet/setfree", (req, res) => {
-  const digipet2 = getDigipet2();
+app.get("/digipet/setfree", async (req, res) => {
+  const digipet2 = await getDB(2);
   if (!digipet2) {
     res.json({
       message:
         "You can't set free your rehomed digipet because you don't have one rehomed!",
     });
   } else {
-    setDigipet2(undefined);
+    await delDB(2);
     res.json({
       message:
         "You have successfully set your rehomed digipet free!",

@@ -1,10 +1,10 @@
 import supertest from "supertest";
-import { INITIAL_DIGIPET, setDigipet } from "../digipet/model";
+import { delDB, INITIAL_DIGIPET, setDigipet } from "../digipet/model";
 import app from "../server";
 
 describe("User can hatch a digipet and inspect it when they don't currently have one, but they can only hatch one digipet", () => {
   // setup: ensure there is no digipet to begin with
-  setDigipet(undefined);
+  delDB(1);
 
   test("1st GET /digipet informs them that they don't currently have a digipet", async () => {
     const response = await supertest(app).get("/digipet");

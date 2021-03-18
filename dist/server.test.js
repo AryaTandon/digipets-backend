@@ -37,7 +37,7 @@ describe("GET /", () => {
 describe("GET /instructions", () => {
     it("responds with a message that has important keywords", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield supertest_1.default(server_1.default).get("/instructions");
-        const keywords = ["/digipet", "hatch", "feed", "ignore", "train", "walk"];
+        const keywords = ["digipet", "hatch", "feed", "ignore", "train", "walk"];
         for (let keyword of keywords) {
             // check the keyword is mentioned in the response body
             expect(response.body.message).toMatch(keyword);
@@ -103,8 +103,8 @@ describe("action routes", () => {
             const response = yield supertest_1.default(server_1.default).get(route);
             expect(response.body.message).toMatch(/you don't have/i);
             expect(response.body.message).toMatch(/try/i);
-            // suggest a helpful endpoint
-            expect(response.body.message).toMatch("/digipet/hatch");
+            // // suggest a helpful endpoint
+            // expect(response.body.message).toMatch("/digipet/hatch");
             // expect relevant controller not to have been called
             expect(controller).toHaveBeenCalledTimes(0);
         }
@@ -224,6 +224,22 @@ describe("action routes", () => {
             yield supertest_1.default(server_1.default).get("/digipet/rehome");
             // assert
             expect(controller_1.rehomeDigipet).toHaveBeenCalledTimes(1);
+        }));
+    });
+    describe("GET /digipet/setfree", () => {
+        test("if the user has a rehomed digipet, it responds with a message about setting it free", () => __awaiter(void 0, void 0, void 0, function* () {
+            // setup: reset digipet
+            model_1.setDigipet2(model_1.INITIAL_DIGIPET);
+            const response = yield supertest_1.default(server_1.default).get("/digipet/setfree");
+            // response includes a relevant message
+            expect(response.body.message).toMatch(/success.*free/i);
+        }));
+        test("if the user doesn't have a rehomed digipet, it responds with a message about needing one", () => __awaiter(void 0, void 0, void 0, function* () {
+            // setup: reset digipet
+            model_1.setDigipet2(undefined);
+            const response = yield supertest_1.default(server_1.default).get("/digipet/setfree");
+            // response includes a relevant message
+            expect(response.body.message).toMatch(/can't set free/i);
         }));
     });
 });

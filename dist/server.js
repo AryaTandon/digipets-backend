@@ -123,7 +123,7 @@ app.get("/digipet/rehome", (req, res) => {
     const digipet2 = model_1.getDigipet2();
     if (digipet2) {
         res.json({
-            message: "You can't rehome another digipet because you already have one rehomed!",
+            message: "You can't rehome another digipet because you already have one rehomed! You can't interact with this digipet anymore now.",
             digipet2,
         });
     }
@@ -131,13 +131,27 @@ app.get("/digipet/rehome", (req, res) => {
         const digipet2 = controller_1.rehomeDigipet();
         model_1.setDigipet(undefined);
         res.json({
-            message: "You have successfully rehomed your 1st digipet!",
+            message: "You have successfully rehomed your 1st digipet! You can't interact with this digipet anymore now.",
             digipet2,
         });
     }
     else {
         res.json({
             message: "You can't rehome a digipet because you don't have any!",
+        });
+    }
+});
+app.get("/digipet/setfree", (req, res) => {
+    const digipet2 = model_1.getDigipet2();
+    if (!digipet2) {
+        res.json({
+            message: "You can't set free your rehomed digipet because you don't have one rehomed!",
+        });
+    }
+    else {
+        model_1.setDigipet2(undefined);
+        res.json({
+            message: "You have successfully set your rehomed digipet free!",
         });
     }
 });

@@ -1,3 +1,9 @@
+const { Pool } = require('pg')
+const connectionString = "postgresql://localhost:5432/digipet";
+const pool = new Pool({
+  connectionString,
+}); 
+
 /**
  * The core Digipet functions.
  *
@@ -36,14 +42,41 @@ export let _userDigipet2: Digipet | undefined;
 /**
  * Get the data for the user digipet (if it exists) - but not the underlying object reference (to protect the data from accidental changes)
  */
-export function getDigipet(): Digipet | undefined {
-  // spread to create a shallow copy to avoid mutation
-  return _userDigipet ? { ..._userDigipet } : undefined;
+export function getDigipet() {
+//   const id = 1;
+//   console.log("eek");
+//   getDB(id);
+//   sleep(1000);
+//   return _userDigipet
+//  // spread to create a shallow copy to avoid mutation
+//   // return _userDigipet ? { ..._userDigipet } : undefined;
 }
 
-export function getDigipet2(): Digipet | undefined {
-  // spread to create a shallow copy to avoid mutation
-  return _userDigipet2 ? { ..._userDigipet2 } : undefined;
+// function sleep(milliseconds: number) {
+//   const date = Date.now();
+//   let currentDate = null;
+//   do {
+//     currentDate = Date.now();
+//   } while (currentDate - date < milliseconds);
+// }
+
+
+export function getDigipet2() {
+//   const id = 2;
+//   console.log("eek")
+//   getDB(id);
+//   sleep(1000);
+//   return _userDigipet2
+//   // const digipet = async () => await getDB(id)
+//   // let hi;
+//   // return digipet().then(res => hi = res)
+//   // digipet().then(res => hi = res)
+//   // while (true) {
+//   //   if (typeof(hi) === "object") 
+//   //     return hi
+//   // }
+//   // spread to create a shallow copy to avoid mutation
+//   // return _userDigipet2 ? { ..._userDigipet2 } : undefined;
 }
 
 /**
@@ -51,14 +84,85 @@ export function getDigipet2(): Digipet | undefined {
  *
  * @param newDigipet The new digipet data; pass `undefined` to effectively remove the digipet
  */
-export function setDigipet(newDigipet?: Digipet | undefined): void {
+export async function setDigipet(newDigipet: Digipet): Promise<void> {
+  const id = 1;
+  await setDB(newDigipet, id)
   // spread to avoid mutation
-  _userDigipet = newDigipet ? { ...newDigipet } : undefined;
+  // _userDigipet = newDigipet ? { ...newDigipet } : undefined;
 }
 
-export function setDigipet2(_userDigipet?: Digipet | undefined ): void {
+export async function setDigipet2(_userDigipet: Digipet): Promise<void> {
+  const id = 2;
+  await setDB(_userDigipet, id)
   // spread to avoid mutation
-  _userDigipet2 = _userDigipet ? { ..._userDigipet } : undefined;
+  // _userDigipet2 = _userDigipet ? { ..._userDigipet } : undefined;
+}
+
+// async/await - check out a client
+export const getDB = async (id: number): Promise <Digipet | undefined> => {
+  const client = await pool.connect()
+  const values = [id];
+  try {
+    const digipetQuery = {
+      text: 'SELECT discipline, happiness, nutrition FROM stats ' +
+      'WHERE id = $1;',
+      values,
+      rowMode: 'array',
+    }
+    let res = await pool.query(digipetQuery) 
+    res ? console.log(res.rows[0][0]) : console.log("noooo...");
+    let digipetStats: Digipet = { 
+      discipline: res.rows[0][0],
+      happiness: res.rows[0][1],
+      nutrition: res.rows[0][2]
+    }
+     if (id === 1) {
+       _userDigipet = digipetStats;
+       return _userDigipet
+     } else {
+       _userDigipet2 = digipetStats;
+       return _userDigipet2
+     }
+    } catch (err) {
+      console.log("okay...")
+      return undefined;
+    } finally {
+      client.release()
+    }
+}
+
+// async/await - check out a client
+const setDB = async ({discipline, happiness, nutrition}: Digipet, id: number) => {
+  const client = await pool.connect()
+  const values = [discipline, happiness, nutrition, id];
+  try {
+    await pool.query('INSERT INTO stats (discipline, happiness, nutrition, id) ' +
+    'VALUES ($1, $2, $3, $4);', values)
+    console.log("Hi3")
+  } catch (err) {
+    await pool.query('UPDATE stats ' +
+    'SET discipline = $1, ' +
+    'happiness = $2, ' +
+    'nutrition = $3 ' +
+    'WHERE id = $4;', values)
+    console.log("Hi2")
+  } finally {
+    client.release()
+  }
+}
+
+// async/await - check out a client
+export const delDB = async (id: number) => {
+  const client = await pool.connect()
+  const values = [id];
+  try {
+    await pool.query('DELETE FROM stats ' +
+    'WHERE id = $1;', values)
+  } catch (err) {
+    console.log(err.stack)
+  } finally {
+    client.release()
+  }
 }
 
 /**
@@ -67,11 +171,11 @@ export function setDigipet2(_userDigipet?: Digipet | undefined ): void {
  * @param digipetKey the digipet measure to update
  * @param netUpdate the intended change - e.g. `12` to increase by 12, `-4` to decrease by 4
  */
-export function updateDigipetBounded(
+export async function updateDigipetBounded(
   digipetKey: keyof Digipet,
   netUpdate: number
-): void {
-  const digipetData = getDigipet(); // is a shallow copy
+): Promise<void> {
+  const digipetData = await getDB(1); // is a shallow copy
   if (digipetData) {
     const valueToBound = digipetData[digipetKey] + netUpdate;
     if (valueToBound > 100) {
@@ -82,6 +186,6 @@ export function updateDigipetBounded(
       digipetData[digipetKey] = valueToBound;
     }
     // shallow copy has updated values to set
-    setDigipet(digipetData);
+    await setDigipet(digipetData);
   }
 }

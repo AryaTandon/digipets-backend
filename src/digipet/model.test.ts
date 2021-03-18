@@ -1,4 +1,4 @@
-import { Digipet, getDigipet, updateDigipetBounded, setDigipet } from "./model";
+import { Digipet, getDigipet, updateDigipetBounded, setDigipet, delDB } from "./model";
 
 describe("getDigipet", () => {
   it("gets the stats for the user digipet (but not the underlying object)", () => {
@@ -13,7 +13,7 @@ describe("getDigipet", () => {
   });
 
   it("returns undefined if there is no digipet", () => {
-    setDigipet(undefined);
+    delDB(1);
     expect(getDigipet()).toBeUndefined();
   });
 
@@ -28,7 +28,7 @@ describe("getDigipet", () => {
 
     // act
     digipetTest.happiness = 0;
-    digipetToMutate!.nutrition = 0;
+    // digipetToMutate!.nutrition = 0;
 
     expect(getDigipet()).toStrictEqual({
       happiness: 60,

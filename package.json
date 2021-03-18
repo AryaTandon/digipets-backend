@@ -2,7 +2,7 @@
   "name": "mark-nodejs-proj--digipet-backend",
   "version": "0.0.1",
   "scripts": {
-    "start": "node dist",
+    "start": "ts-node src",
     "start:dev": "ts-node-dev src",
     "build": "tsc",
     "test": "jest",
@@ -26,6 +26,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "pg": "^8.5.1"
   }
 }

@@ -7,7 +7,7 @@ import {
   ignoreDigipet,
   rehomeDigipet,
 } from "./digipet/controller";
-import { INITIAL_DIGIPET, setDigipet, setDigipet2 } from "./digipet/model";
+import { delDB, INITIAL_DIGIPET, setDigipet, setDigipet2 } from "./digipet/model";
 import app from "./server";
 
 /**
@@ -50,7 +50,7 @@ describe("GET /digipet", () => {
   });
 
   test("if the user has no digipet, it responds with a message about not having a digipet", async () => {
-    setDigipet(undefined);
+    delDB(1);
     const response = await supertest(app).get("/digipet");
     expect(response.body.digipet).not.toBeDefined();
     expect(response.body.message).toMatch(/don't have/i);
@@ -78,7 +78,7 @@ describe("GET /digipet/hatch", () => {
     if (jest.isMockFunction(hatchDigipet) /* type guard */) {
       hatchDigipet.mockReset();
     }
-    setDigipet(undefined);
+    delDB(1);
 
     // act
     const response = await supertest(app).get("/digipet/hatch");
@@ -107,7 +107,7 @@ describe("action routes", () => {
       if (jest.isMockFunction(controller) /* type guard */) {
         controller.mockReset();
       }
-      setDigipet(undefined);
+      delDB(1);
       const response = await supertest(app).get(route);
       expect(response.body.message).toMatch(/you don't have/i);
       expect(response.body.message).toMatch(/try/i);
@@ -275,7 +275,7 @@ describe("action routes", () => {
 
     test("if the user doesn't have a rehomed digipet, it responds with a message about needing one", async () => {
       // setup: reset digipet
-      setDigipet2(undefined);
+      delDB(2);
   
       const response = await supertest(app).get("/digipet/setfree");
   

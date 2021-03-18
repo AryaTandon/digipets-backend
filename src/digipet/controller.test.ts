@@ -5,7 +5,7 @@ import {
   walkDigipet,
   ignoreDigipet,
 } from "./controller";
-import { getDigipet, INITIAL_DIGIPET, setDigipet } from "./model";
+import { delDB, getDigipet, INITIAL_DIGIPET, setDigipet } from "./model";
 
 describe("feedDigipet", () => {
   it("increases digipet nutrition by 10 and decreases discipline by 5", () => {
@@ -50,7 +50,7 @@ describe("feedDigipet", () => {
 describe("hatchDigipet", () => {
   test("when there is no current digipet, it creates a digipet with default initial values and returns it", () => {
     // setup
-    setDigipet(undefined);
+    delDB(1);
 
     // act
     const digipet = hatchDigipet();
@@ -203,7 +203,7 @@ describe("ignoreDigipet", () => {
 describe("rehomeDigipet", () => {
   test("when there is no 2nd digipet, it rehomes the current digipet", () => {
     // setup
-    setDigipet(undefined);
+    delDB(1);
 
     // act
     const digipet = hatchDigipet();
