@@ -13,7 +13,7 @@ describe("getDigipet", () => {
         expect(model_1.getDigipet()).not.toBe(digipetTest);
     });
     it("returns undefined if there is no digipet", () => {
-        model_1.setDigipet(undefined);
+        model_1.delDB(1);
         expect(model_1.getDigipet()).toBeUndefined();
     });
     it("resists accidental mutation", () => {
@@ -26,7 +26,7 @@ describe("getDigipet", () => {
         const digipetToMutate = model_1.getDigipet();
         // act
         digipetTest.happiness = 0;
-        digipetToMutate.nutrition = 0;
+        // digipetToMutate!.nutrition = 0;
         expect(model_1.getDigipet()).toStrictEqual({
             happiness: 60,
             nutrition: 60,

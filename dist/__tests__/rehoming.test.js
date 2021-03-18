@@ -17,7 +17,7 @@ const model_1 = require("../digipet/model");
 const server_1 = __importDefault(require("../server"));
 describe("User can't rehome a digipet if they don't have any", () => {
     // setup: ensure there is no digipet to begin with
-    model_1.setDigipet(undefined);
+    model_1.delDB(1);
     test("1st GET /digipet informs them that they currently have a digipet", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield supertest_1.default(server_1.default).get("/digipet");
         expect(response.body.message).toMatch(/don't have/i);

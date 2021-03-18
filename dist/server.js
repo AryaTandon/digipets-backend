@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -22,8 +31,8 @@ app.get("/instructions", (req, res) => {
         message: "Instructions: you can take various actions by clicking the buttons for actions like walk, train, feed, ignore and hatch. For example, try clicking the 'walk' button to walk a digipet. You can also rehome your initial digipet - although it stays in its new home for eternity, and you can't interact with it anymore. You'll have to get another one!",
     });
 });
-app.get("/digipet", (req, res) => {
-    const digipet = model_1.getDigipet();
+app.get("/digipet", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const digipet = yield model_1.getDB(1);
     if (digipet) {
         res.json({
             message: "Your digipet is waiting for you!",
@@ -37,30 +46,31 @@ app.get("/digipet", (req, res) => {
             digipet: undefined,
         });
     }
-});
-app.get("/digipet/hatch", (req, res) => {
-    const digipet = model_1.getDigipet();
+}));
+app.get("/digipet/hatch", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const digipet = yield model_1.getDB(1);
     if (digipet) {
         res.json({
             message: "You can't hatch a digipet now because you already have one!",
-            digipet,
+            digipet
         });
     }
     else {
-        const digipet = controller_1.hatchDigipet();
+        const hatchedDigipet = yield controller_1.hatchDigipet();
         res.json({
             message: "You have successfully hatched an adorable new digipet. Just the cutest.",
-            digipet,
+            hatchedDigipet
         });
     }
-});
-app.get("/digipet/feed", (req, res) => {
+}));
+app.get("/digipet/feed", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // check the user has a digipet to walk
-    if (model_1.getDigipet()) {
-        controller_1.feedDigipet();
+    let digipet = yield model_1.getDB(1);
+    if (digipet) {
+        yield controller_1.feedDigipet();
         res.json({
             message: "You fed your digipet. It's not as hungry now!",
-            digipet: model_1.getDigipet(),
+            digipet: yield model_1.getDB(1)
         });
     }
     else {
@@ -69,14 +79,15 @@ app.get("/digipet/feed", (req, res) => {
             description: "This is done by going to endpoint /digipet/hatch"
         });
     }
-});
-app.get("/digipet/train", (req, res) => {
+}));
+app.get("/digipet/train", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // check the user has a digipet to walk
-    if (model_1.getDigipet()) {
-        controller_1.trainDigipet();
+    let digipet = yield model_1.getDB(1);
+    if (digipet) {
+        yield controller_1.trainDigipet();
         res.json({
             message: "You trained your digipet. It's more disciplined now!",
-            digipet: model_1.getDigipet(),
+            digipet: yield model_1.getDB(1)
         });
     }
     else {
@@ -85,14 +96,15 @@ app.get("/digipet/train", (req, res) => {
             description: "This is done by going to endpoint /digipet/hatch"
         });
     }
-});
-app.get("/digipet/walk", (req, res) => {
+}));
+app.get("/digipet/walk", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // check the user has a digipet to walk
-    if (model_1.getDigipet()) {
-        controller_1.walkDigipet();
+    let digipet = yield model_1.getDB(1);
+    if (digipet) {
+        yield controller_1.walkDigipet();
         res.json({
             message: "You walked your digipet. It looks happier now!",
-            digipet: model_1.getDigipet(),
+            digipet: yield model_1.getDB(1)
         });
     }
     else {
@@ -101,14 +113,15 @@ app.get("/digipet/walk", (req, res) => {
             description: "This is done by going to endpoint /digipet/hatch"
         });
     }
-});
-app.get("/digipet/ignore", (req, res) => {
+}));
+app.get("/digipet/ignore", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // check the user has a digipet to walk
-    if (model_1.getDigipet()) {
-        controller_1.ignoreDigipet();
+    let digipet = yield model_1.getDB(1);
+    if (digipet) {
+        yield controller_1.ignoreDigipet();
         res.json({
             message: "You ignored your digipet. How could you?!",
-            digipet: model_1.getDigipet(),
+            digipet: yield model_1.getDB(1)
         });
     }
     else {
@@ -117,10 +130,10 @@ app.get("/digipet/ignore", (req, res) => {
             description: "This is done by going to endpoint /digipet/hatch"
         });
     }
-});
-app.get("/digipet/rehome", (req, res) => {
-    const digipet = model_1.getDigipet();
-    const digipet2 = model_1.getDigipet2();
+}));
+app.get("/digipet/rehome", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const digipet = yield model_1.getDB(1);
+    const digipet2 = yield model_1.getDB(2);
     if (digipet2) {
         res.json({
             message: "You can't rehome another digipet because you already have one rehomed! You can't interact with this digipet anymore now.",
@@ -128,11 +141,11 @@ app.get("/digipet/rehome", (req, res) => {
         });
     }
     else if (digipet && !digipet2) {
-        const digipet2 = controller_1.rehomeDigipet();
-        model_1.setDigipet(undefined);
+        yield controller_1.rehomeDigipet();
+        yield model_1.delDB(1);
         res.json({
             message: "You have successfully rehomed your 1st digipet! You can't interact with this digipet anymore now.",
-            digipet2,
+            digipet2: yield model_1.getDB(2)
         });
     }
     else {
@@ -140,19 +153,19 @@ app.get("/digipet/rehome", (req, res) => {
             message: "You can't rehome a digipet because you don't have any!",
         });
     }
-});
-app.get("/digipet/setfree", (req, res) => {
-    const digipet2 = model_1.getDigipet2();
+}));
+app.get("/digipet/setfree", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const digipet2 = yield model_1.getDB(2);
     if (!digipet2) {
         res.json({
             message: "You can't set free your rehomed digipet because you don't have one rehomed!",
         });
     }
     else {
-        model_1.setDigipet2(undefined);
+        yield model_1.delDB(2);
         res.json({
             message: "You have successfully set your rehomed digipet free!",
         });
     }
-});
+}));
 exports.default = app;

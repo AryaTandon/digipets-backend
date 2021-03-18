@@ -52,7 +52,7 @@ describe("GET /digipet", () => {
         expect(response.body.message).toMatch(/your digipet/i);
     }));
     test("if the user has no digipet, it responds with a message about not having a digipet", () => __awaiter(void 0, void 0, void 0, function* () {
-        model_1.setDigipet(undefined);
+        model_1.delDB(1);
         const response = yield supertest_1.default(server_1.default).get("/digipet");
         expect(response.body.digipet).not.toBeDefined();
         expect(response.body.message).toMatch(/don't have/i);
@@ -76,7 +76,7 @@ describe("GET /digipet/hatch", () => {
         if (jest.isMockFunction(controller_1.hatchDigipet) /* type guard */) {
             controller_1.hatchDigipet.mockReset();
         }
-        model_1.setDigipet(undefined);
+        model_1.delDB(1);
         // act
         const response = yield supertest_1.default(server_1.default).get("/digipet/hatch");
         // assert
@@ -99,7 +99,7 @@ describe("action routes", () => {
             if (jest.isMockFunction(controller) /* type guard */) {
                 controller.mockReset();
             }
-            model_1.setDigipet(undefined);
+            model_1.delDB(1);
             const response = yield supertest_1.default(server_1.default).get(route);
             expect(response.body.message).toMatch(/you don't have/i);
             expect(response.body.message).toMatch(/try/i);
@@ -236,7 +236,7 @@ describe("action routes", () => {
         }));
         test("if the user doesn't have a rehomed digipet, it responds with a message about needing one", () => __awaiter(void 0, void 0, void 0, function* () {
             // setup: reset digipet
-            model_1.setDigipet2(undefined);
+            model_1.delDB(2);
             const response = yield supertest_1.default(server_1.default).get("/digipet/setfree");
             // response includes a relevant message
             expect(response.body.message).toMatch(/can't set free/i);

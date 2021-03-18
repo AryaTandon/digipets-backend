@@ -36,7 +36,7 @@ describe("feedDigipet", () => {
 describe("hatchDigipet", () => {
     test("when there is no current digipet, it creates a digipet with default initial values and returns it", () => {
         // setup
-        model_1.setDigipet(undefined);
+        model_1.delDB(1);
         // act
         const digipet = controller_1.hatchDigipet();
         // assert
@@ -154,7 +154,7 @@ describe("ignoreDigipet", () => {
 describe("rehomeDigipet", () => {
     test("when there is no 2nd digipet, it rehomes the current digipet", () => {
         // setup
-        model_1.setDigipet(undefined);
+        model_1.delDB(1);
         // act
         const digipet = controller_1.hatchDigipet();
         // assert

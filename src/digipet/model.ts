@@ -1,8 +1,16 @@
-const { Pool } = require('pg')
-const connectionString = "postgresql://localhost:5432/digipet";
-const pool = new Pool({
-  connectionString,
+require("dotenv").config(); 
+if (!process.env.DATABASE_URL) {
+  throw "You're missing the DATABASE_URL env variable!"
+}
+
+const { Client, Pool } = require('pg')
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 }); 
+client.connect();
 
 /**
  * The core Digipet functions.
@@ -100,7 +108,6 @@ export async function setDigipet2(_userDigipet: Digipet): Promise<void> {
 
 // async/await - check out a client
 export const getDB = async (id: number): Promise <Digipet | undefined> => {
-  const client = await pool.connect()
   const values = [id];
   try {
     const digipetQuery = {
@@ -109,7 +116,7 @@ export const getDB = async (id: number): Promise <Digipet | undefined> => {
       values,
       rowMode: 'array',
     }
-    let res = await pool.query(digipetQuery) 
+    let res = await client.query(digipetQuery) 
     res ? console.log(res.rows[0][0]) : console.log("noooo...");
     let digipetStats: Digipet = { 
       discipline: res.rows[0][0],
@@ -126,42 +133,34 @@ export const getDB = async (id: number): Promise <Digipet | undefined> => {
     } catch (err) {
       console.log("okay...")
       return undefined;
-    } finally {
-      client.release()
     }
 }
 
 // async/await - check out a client
 const setDB = async ({discipline, happiness, nutrition}: Digipet, id: number) => {
-  const client = await pool.connect()
   const values = [discipline, happiness, nutrition, id];
   try {
-    await pool.query('INSERT INTO stats (discipline, happiness, nutrition, id) ' +
+    await client.query('INSERT INTO stats (discipline, happiness, nutrition, id) ' +
     'VALUES ($1, $2, $3, $4);', values)
     console.log("Hi3")
   } catch (err) {
-    await pool.query('UPDATE stats ' +
+    await client.query('UPDATE stats ' +
     'SET discipline = $1, ' +
     'happiness = $2, ' +
     'nutrition = $3 ' +
     'WHERE id = $4;', values)
     console.log("Hi2")
-  } finally {
-    client.release()
   }
 }
 
 // async/await - check out a client
 export const delDB = async (id: number) => {
-  const client = await pool.connect()
   const values = [id];
   try {
-    await pool.query('DELETE FROM stats ' +
+    await client.query('DELETE FROM stats ' +
     'WHERE id = $1;', values)
   } catch (err) {
     console.log(err.stack)
-  } finally {
-    client.release()
   }
 }
 
